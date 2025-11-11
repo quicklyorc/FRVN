@@ -1,0 +1,44 @@
+# ===== Common =====
+# PROJECT_ID: (필수) GCP 프로젝트 ID. gcloud/배포 스크립트가 이 값을 사용합니다.
+PROJECT_ID={{PROJECT_NAME}}-gcp
+# REGION: (필수) 기본 리전(Artifact Registry/Cloud Run/GCS 버킷).
+REGION=asia-northeast3
+# SERVICE_NAME: (필수) 서비스 이름 접두사(Cloud Run 서비스명, LB 구성 등에 반영).
+SERVICE_NAME={{SERVICE_NAME}}
+# ARTIFACT_REPO: (필수) Artifact Registry 리포지토리 이름.
+ARTIFACT_REPO={{ARTIFACT_REPO}}
+# IMAGE_TAG: (선택) 배포 이미지 태그.
+IMAGE_TAG={{IMAGE_TAG}}
+
+# ===== Frontend/CDN =====
+# FRONTEND_BUCKET: (필수) 정적 프런트 호스팅용 GCS 버킷명.
+FRONTEND_BUCKET={{SERVICE_NAME}}-bucket
+# CACHE_TTL: (선택) CDN/GCS 캐시 만료(초).
+CACHE_TTL=3600
+# CDN: (선택) 1이면 CDN 사용 플래그(기본 활성).
+CDN=1
+
+# ===== Domains (optional) =====
+# FRONTEND_DOMAIN: (선택) 프런트 도메인(HTTPS LB/SSL 자동구성).
+FRONTEND_DOMAIN=
+# BACKEND_DOMAIN: (선택) 백엔드 도메인(현 스크립트 비사용, VM+certbot 시 활용 가능).
+BACKEND_DOMAIN=
+# ADMIN_EMAIL: (선택) certbot 이메일(현 스크립트 비사용).
+ADMIN_EMAIL=
+
+# ===== Backend =====
+# BACKEND_PORT: (개발) uvicorn dev 포트.
+BACKEND_PORT=8000
+# UVICORN_WORKERS: (개발) uvicorn 워커 수(대개 --reload로 미사용).
+UVICORN_WORKERS=1
+# GUNICORN_WORKERS: (운영) gunicorn 워커 수.
+GUNICORN_WORKERS=2
+# LOG_LEVEL: (공통) 로그 레벨.
+LOG_LEVEL=info
+
+# ===== Compose (dev) =====
+# DEV_UID/DEV_GID: (개발) 파일 권한 이슈 방지용 UID/GID(옵션).
+DEV_UID=1000
+DEV_GID=1000
+
+
