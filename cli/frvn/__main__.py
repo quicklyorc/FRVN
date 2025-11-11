@@ -81,7 +81,14 @@ def copy_template(src: Path, dst: Path, replacements: dict[str, str]) -> None:
 
 def cmd_init(args: argparse.Namespace) -> int:
     here = Path(__file__).resolve().parent
-    template_dir = (here.parents[1] / "template").resolve()
+    # 1) Prefer packaged resources: frvn/resources/template (installed wheel)
+    packaged_template = here / "resources" / "template"
+    if packaged_template.exists():
+        template_dir = packaged_template
+    else:
+        # 2) Fallback for development: repo-root/template (when running from source tree)
+        # here: .../FRVN/cli/frvn/__main__.py -> parents[2] = repo root (FRVN)
+        template_dir = (here.parents[2] / "template").resolve()
 
     target_dir = Path(args.destination).resolve()
     project_name = args.name or target_dir.name

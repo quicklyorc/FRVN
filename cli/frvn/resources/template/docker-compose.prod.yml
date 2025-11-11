@@ -1,0 +1,22 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.backend
+    environment:
+      - PORT=8080
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - GUNICORN_WORKERS=${GUNICORN_WORKERS:-2}
+    ports:
+      - "8080:8080"
+  frontend-static:
+    image: nginx:alpine
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend/dist:/usr/share/nginx/html:ro
+    ports:
+      - "8081:80"
+
+
+

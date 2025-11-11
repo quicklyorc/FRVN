@@ -24,7 +24,7 @@ frvn init ./myapp --name myapp --service myapp
 릴리스 태그에서 설치(권장):
 
 ```bash
-pipx install "git+https://github.com/quicklyorc/FRVN.git@v0.1.0#subdirectory=cli"
+pipx install "git+https://github.com/quicklyorc/FRVN.git@v0.1.1#subdirectory=cli"
 ```
 
 ## CLI 명령 요약
