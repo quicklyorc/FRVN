@@ -20,9 +20,6 @@ def render_text(text: str, replacements: dict[str, str]) -> str:
 def copy_template(src: Path, dst: Path, replacements: dict[str, str]) -> None:
     if not src.exists():
         raise FileNotFoundError(f"Template not found: {src}")
-    if dst.exists():
-        # ensure clean destination to avoid permission/metadata issues
-        shutil.rmtree(dst)
 
     # Create directories
     for p in src.rglob("*"):
@@ -38,26 +35,40 @@ def copy_template(src: Path, dst: Path, replacements: dict[str, str]) -> None:
             target = dst / rel
             if p.name == ".envexample":
                 # Some environments block reading *.env* files; generate a safe default
+                # Include descriptive comments for each variable to guide users.
                 default_env = (
+                    "# GCP 프로젝트 및 리전 설정\n"
                     "PROJECT_ID={{PROJECT_NAME}}-gcp\n"
                     "REGION=asia-northeast3\n"
+                    "\n"
+                    "# 서비스/이미지 관련 설정\n"
+                    "# SERVICE_NAME: Cloud Run 서비스명 및 컨테이너 이미지명 접두로 사용\n"
                     "SERVICE_NAME={{SERVICE_NAME}}\n"
+                    "# ARTIFACT_REPO: GCP Artifact Registry 리포지토리명 (사전 생성 필요)\n"
                     "ARTIFACT_REPO={{ARTIFACT_REPO}}\n"
+                    "# IMAGE_TAG: 컨테이너 이미지 태그 (latest 권장, 배포마다 변경 가능)\n"
                     "IMAGE_TAG={{IMAGE_TAG}}\n"
                     "\n"
+                    "# 정적 프런트엔드 자산 관련 설정(선택)\n"
+                    "# FRONTEND_BUCKET: 정적 파일 호스팅 버킷명\n"
                     "FRONTEND_BUCKET={{SERVICE_NAME}}-bucket\n"
+                    "# CACHE_TTL: CDN/캐시 TTL(초)\n"
                     "CACHE_TTL=3600\n"
+                    "# CDN: 1이면 CDN 사용, 0이면 미사용\n"
                     "CDN=1\n"
                     "\n"
+                    "# 커스텀 도메인(선택). 설정 시 배포 스크립트에서 참고만 합니다.\n"
                     "FRONTEND_DOMAIN=\n"
                     "BACKEND_DOMAIN=\n"
                     "ADMIN_EMAIL=\n"
                     "\n"
+                    "# 로컬 개발용 백엔드 실행 포트 및 로그 설정\n"
                     "BACKEND_PORT=8000\n"
                     "UVICORN_WORKERS=1\n"
                     "GUNICORN_WORKERS=2\n"
                     "LOG_LEVEL=info\n"
                     "\n"
+                    "# 로컬 도커 개발 편의용 UID/GID (퍼미션 이슈 방지)\n"
                     "DEV_UID=1000\n"
                     "DEV_GID=1000\n"
                 )
@@ -103,6 +114,13 @@ def cmd_init(args: argparse.Namespace) -> int:
 
     print(f"Generating project into: {target_dir}")
     copy_template(template_dir, target_dir, replacements)
+    # Also export deploy/ scripts into the project by default for convenience
+    class _NS:  # simple namespace for reuse of export handler
+        pass
+    ns = _NS()
+    ns.to = str(target_dir)
+    ns.force = False
+    cmd_export_deploy(ns)
     print("Done.")
     return 0
 
@@ -179,7 +197,7 @@ def build_parser() -> argparse.ArgumentParser:
     sub = parser.add_subparsers(dest="command", required=True)
 
     p_init = sub.add_parser("init", help="Initialize a new project from template")
-    p_init.add_argument("destination", help="Target directory")
+    p_init.add_argument("destination", nargs="?", default=".", help="Target directory (default: .)")
     p_init.add_argument("--name", help="Project name")
     p_init.add_argument("--service", help="Service name")
     p_init.add_argument("--artifact-repo", help="Artifact Registry repo name")
