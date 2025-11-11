@@ -16,8 +16,7 @@ docker run --rm -v "$PWD:/work" -w /work frvn-cli init ./myapp --name myapp --se
 ### pipx로 설치 (GitHub)
 
 ```bash
-# GitHub 경로는 실제 저장소로 바꿔주세요
-pipx install git+https://github.com/<org>/FRVN.git#subdirectory=cli
+pipx install git+https://github.com/quicklyorc/FRVN.git#subdirectory=cli
 frvn doctor                       # 도구 확인
 frvn init ./myapp --name myapp --service myapp
 ```
@@ -25,7 +24,7 @@ frvn init ./myapp --name myapp --service myapp
 릴리스 태그에서 설치(권장):
 
 ```bash
-pipx install "git+https://github.com/<org>/FRVN.git@v0.1.0#subdirectory=cli"
+pipx install "git+https://github.com/quicklyorc/FRVN.git.git@v0.1.0#subdirectory=cli"
 ```
 
 ## CLI 명령 요약
@@ -170,7 +169,7 @@ frvn deploy cloudrun                 # 또는: frvn deploy vm
 
 ## 배포 패키징/배포 대안
 
-- GitHub pipx 설치(권장): `pipx install git+https://github.com/<org>/FRVN.git#subdirectory=cli`
+- GitHub pipx 설치(권장): `pipx install git+https://github.com/quicklyorc/FRVN.git#subdirectory=cli`
 - Dockerized CLI: `docker build -t frvn-cli -f cli/Dockerfile cli` 후 컨테이너로 실행
 - GitHub 템플릿 리포지토리: 패키지 설치 없이 “Use this template”로 초기화
 
