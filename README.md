@@ -3,28 +3,24 @@ FRVN: FastAPI + React + Vite + Nginx 모노 템플릿
 개발은 Docker(venv 미사용), dev는 docker-compose, prod는 멀티스테이지 Dockerfile, 운영 시 백엔드 컨테이너 내부 Nginx가 리버스 프록시/LB 역할을 수행합니다. GCP 배포 스크립트(Cloud Run, VM)와 정적 프론트(GCS+CDN) 자동화를 제공합니다.
 
 ## 설치/사용
+pipx로 설치하여 사용합니다.
 
-CLI를 컨테이너로 실행하거나, pipx로 설치하여 사용합니다.
 
-### 컨테이너로 CLI 사용
 
-```bash
-docker build -t frvn-cli -f cli/Dockerfile cli
-docker run --rm -v "$PWD:/work" -w /work frvn-cli init ./myapp --name myapp --service myapp
-```
 
 ### pipx로 설치 (GitHub)
 
 ```bash
 pipx install git+https://github.com/quicklyorc/FRVN.git#subdirectory=cli
-frvn doctor                       # 도구 확인
-frvn init ./myapp --name myapp --service myapp
+frvn doctor
+mkdir myapp && cd myapp
+frvn init
 ```
 
 릴리스 태그에서 설치(권장):
 
 ```bash
-pipx install "git+https://github.com/quicklyorc/FRVN.git@v0.1.1#subdirectory=cli"
+pipx install "git+https://github.com/quicklyorc/FRVN.git@v0.1.0#subdirectory=cli"
 ```
 
 ## CLI 명령 요약
@@ -35,12 +31,13 @@ pipx install "git+https://github.com/quicklyorc/FRVN.git@v0.1.1#subdirectory=cli
 # 로컬 도구 검증 (docker/gcloud/node/npm/python3)
 frvn doctor
 
-# 템플릿에서 새 프로젝트 생성
-frvn init ./myapp --name myapp --service myapp --artifact-repo frvn-repo --image-tag latest
+# 템플릿에서 새 프로젝트 생성 (현재 폴더)
+mkdir myapp && cd myapp
+frvn init
 
-# 프로젝트에 배포 스크립트 export (deploy/ 생성)
-cd myapp
-frvn export deploy --to .            # 이미 존재하면 --force로 덮어쓰기
+# 프로젝트에 배포 스크립트 export (deploy/ 생성; init에서 자동 복사됨)
+# 필요 시 덮어쓰기
+frvn export deploy --to . --force
 
 # CLI가 export → 배포 스크립트 실행까지 자동 수행
 frvn deploy cloudrun                 # 또는: frvn deploy vm
@@ -62,10 +59,10 @@ frvn deploy cloudrun                 # 또는: frvn deploy vm
 
 ```text
 .
-├─ cli/                      # FRVN CLI 패키지 (pipx 설치 가능)
+├─ cli/                      # FRVN CLI 패키지 (pipx 설치)
 │  ├─ frvn/                  # 엔트리포인트 (__main__.py)
 │  ├─ pyproject.toml         # 패키징 메타
-│  └─ Dockerfile             # CLI 컨테이너 빌드
+│  └─ Dockerfile             # (개발용) CLI용 Dockerfile
 ├─ template/                 # 실제 생성될 프로젝트 스캐폴드(읽기전용 원본)
 │  ├─ backend/               # FastAPI + Nginx + Supervisor
 │  ├─ frontend/              # React + Vite + Tailwind
@@ -87,9 +84,8 @@ frvn deploy cloudrun                 # 또는: frvn deploy vm
 ```
 
 ### CLI 빌드/설치 시 산출물
-- pipx 또는 pip로 설치하면 `frvn` 명령이 시스템 PATH에 등록됩니다.
+- pipx로 설치하면 `frvn` 명령이 시스템 PATH에 등록됩니다.
 - `python -m build cli/`를 수행하면 `cli/dist/` 하위에 wheel(`.whl`)과 sdist(`.tar.gz`)가 생성됩니다.
-- CLI 컨테이너 빌드 시 `frvn` 이 엔트리포인트로 포함된 이미지가 생성됩니다.
 
 ### `frvn init` 후 생성되는 프로젝트 구조(요약)
 
@@ -168,9 +164,7 @@ frvn deploy cloudrun                 # 또는: frvn deploy vm
 - pre-commit: 포맷/린트 훅 제공
 
 ## 배포 패키징/배포 대안
-
 - GitHub pipx 설치(권장): `pipx install git+https://github.com/quicklyorc/FRVN.git#subdirectory=cli`
-- Dockerized CLI: `docker build -t frvn-cli -f cli/Dockerfile cli` 후 컨테이너로 실행
 - GitHub 템플릿 리포지토리: 패키지 설치 없이 “Use this template”로 초기화
 
 

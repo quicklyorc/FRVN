@@ -19,7 +19,6 @@ frvn doctor
 mkdir myapp && cd myapp
 frvn init
 
-cd myapp
 cp .envexample .env   # 설명이 포함된 예시를 .env로 복사
 export $(grep -v '^#' .env | xargs) || true
 

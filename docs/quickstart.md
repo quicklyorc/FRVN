@@ -7,13 +7,13 @@
 1) 템플릿 생성
 
 ```bash
-frvn init ./myapp --name myapp --service myapp
+mkdir myproj && cd myproj
+frvn init
 ```
 
 2) 개발 실행
 
 ```bash
-cd myapp
 cp .envexample .env
 docker compose -f docker-compose.dev.yml up -d --build
 ```
@@ -23,7 +23,8 @@ docker compose -f docker-compose.dev.yml up -d --build
 배포
 
 ```bash
-frvn export deploy --to .
+# init 시 deploy/가 자동 생성됩니다. 필요 시 덮어쓸 때:
+frvn export deploy --to . --force
 export $(grep -v '^#' .env | xargs) || true
 bash deploy/deploy_gcp_cloudrun.sh   # 또는 deploy/deploy_gcp_vm.sh
 ```

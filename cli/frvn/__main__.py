@@ -101,7 +101,12 @@ def cmd_init(args: argparse.Namespace) -> int:
         # here: .../FRVN/cli/frvn/__main__.py -> parents[2] = repo root (FRVN)
         template_dir = (here.parents[2] / "template").resolve()
 
-    target_dir = Path(args.destination).resolve()
+    # Determine target directory:
+    # - If destination provided (not "."), respect it with resolve()
+    # - Otherwise, prefer $PWD (shell-reported CWD) if valid; fallback to os.getcwd()
+    # Always generate into current working directory for simplicity
+    target_dir = Path.cwd()
+
     project_name = args.name or target_dir.name
     service_name = args.service or project_name.replace("_", "-")
 
